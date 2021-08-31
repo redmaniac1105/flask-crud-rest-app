@@ -4,7 +4,7 @@ import logging as logger
 logger.basicConfig(level="DEBUG")
 
 flaskAppInstance = Flask(__name__)
-flaskAppInstance.config["MONGO_URI"] = "mongodb://localhost:27017/VRBlog"
+flaskAppInstance.config["MONGO_URI"] = "mongodb+srv://redmaniac:redmaniac@vrblog.d5fnr.mongodb.net/VRBlog?retryWrites=true&w=majority"
 
 mongo = PyMongo(flaskAppInstance) 
 
