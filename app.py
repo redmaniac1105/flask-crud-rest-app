@@ -4,9 +4,9 @@ import logging as logger
 logger.basicConfig(level="DEBUG")
 
 flaskAppInstance = Flask(__name__)
-flaskAppInstance.config["MONGO_URI"] = "mongodb+srv://redmaniac:redmaniac@vrblog.d5fnr.mongodb.net/VRBlog?retryWrites=true&w=majority"
+#flaskAppInstance.config["MONGO_URI"] = "mongodb+srv://redmaniac:redmaniac@vrblog.d5fnr.mongodb.net/VRBlog?retryWrites=true&w=majority"
 
-mongo = PyMongo(flaskAppInstance) 
+#mongo = PyMongo(flaskAppInstance) 
 
 if __name__ == '__main__':
     logger.debug("Starting the app")

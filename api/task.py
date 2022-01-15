@@ -1,7 +1,81 @@
 from flask import jsonify, request
 from flask_restful import Resource
-from app import mongo
+#from app import mongo
 import logging as logger
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+class KeywordSearch(Resource):
+    def post(self):
+        body = request.get_json()
+        PATH = 'C:\Program Files (x86)\chromedriver.exe'
+
+        driver = webdriver.Chrome(PATH)
+
+        driver.get("http://www.seobook.com/user")
+        print(driver.title)
+
+        username = driver.find_element_by_name("name")
+        username.send_keys("arrowgance99")
+
+        password = driver.find_element_by_name("pass")
+        password.send_keys("RmB7MMRMKB")
+
+        password.send_keys(Keys.RETURN)
+
+        textinp = body['blogDescription']
+
+        textinp = " ".join(textinp.split())
+        try:
+            element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.LINK_TEXT, "Tools"))
+            )
+            element.click()
+
+            element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.LINK_TEXT, "Keyword Density Analyzer"))
+            )
+            element.click()
+
+            element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "a[data-type='text']"))
+            )
+            element.click()
+            
+            element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.ID, "url"))
+            )
+            element.clear()
+            element.send_keys(textinp)
+            element = driver.find_element_by_id("form-submit")
+            element.click()
+
+            element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "row"))
+            )
+            body = element.find_elements_by_tag_name("table")
+            keywords = dict()
+            for e in body:
+                tbody = e.find_element_by_tag_name("tbody")
+                rows = tbody.find_elements_by_tag_name("tr")
+                keys = []
+                for row in rows:
+                    datas = row.find_elements_by_tag_name("td")
+                    rowdata = []
+                    for data in datas:
+                        rowdata.append(data.text)
+                    keyDict = {"Keyword":rowdata[0],"Density":rowdata[2]}
+                    keys.append(keyDict)
+                head = e.find_element_by_tag_name("th")
+                keywords.update({head.text:keys})
+            return jsonify(keywords)
+            time.sleep(5)
+        finally:
+            driver.quit()
 
 class Task1(Resource):
     def get(self,author):
@@ -14,8 +88,7 @@ class Task1(Resource):
             output = {'author' : q['author'], 'title' : q['title'], 'blog' : q['blog']}
         else:
             output = 'Not found'
-        return jsonify({'result' : output}) 
-
+        return jsonify({'result' : output})
 
 class Task(Resource):       
     def get(self):
